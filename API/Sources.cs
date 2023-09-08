@@ -1,25 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Windows_Development_AIO.API
 {
-    public class CPP
+    public class Sources
     {
-        public enum Files
+        public enum CPPFiles
         {
             vcpkg,
             mingw,
         }
 
-        public static string GetSource(Files file)
+        private static readonly Dictionary<CPPFiles, string> CppURLS = new Dictionary<CPPFiles, string>
         {
-            switch (file)
+            { CPPFiles.vcpkg, "https://netcologne.dl.sourceforge.net/project/mingw/Installer/mingw-get-setup.exe" },
+            { CPPFiles.mingw, "https://github.com/microsoft/vcpkg" }
+        };
+
+        public static string GetSource(CPPFiles file)
+        {
+            if (CppURLS.ContainsKey(file))
             {
-                case Files.vcpkg:
-                    return "https://netcologne.dl.sourceforge.net/project/mingw/Installer/mingw-get-setup.exe";
-                case Files.mingw:
-                    return "https://github.com/microsoft/vcpkg";
-                default:
-                    throw new ArgumentException("Missing file args");
+                return CppURLS[file];
+            }
+            else
+            {
+                throw new ArgumentException("Missing file args");
             }
         }
     }
