@@ -11,17 +11,26 @@ namespace Windows_Development_AIO.API
             mingw,
         }
 
-        private static readonly Dictionary<CPPFiles, string> CppURLS = new Dictionary<CPPFiles, string>
+        public enum CSFiles
+        {
+            a,
+            b,
+        }
+
+        private static readonly Dictionary<Enum, string> UrlDictionary = new Dictionary<Enum, string>
         {
             { CPPFiles.vcpkg, "https://netcologne.dl.sourceforge.net/project/mingw/Installer/mingw-get-setup.exe" },
-            { CPPFiles.mingw, "https://github.com/microsoft/vcpkg" }
+            { CPPFiles.mingw, "https://github.com/microsoft/vcpkg" },
+            { CSFiles.a, "a" }, // Testing multi functionality
         };
 
-        public static string GetSource(CPPFiles file)
+        public static string GetSource(Enum file, Dictionary<Enum, string> dictionary = null)
         {
-            if (CppURLS.ContainsKey(file))
+            Dictionary<Enum, string> sourceDictionary = dictionary ?? UrlDictionary;
+
+            if (sourceDictionary.ContainsKey(file))
             {
-                return CppURLS[file];
+                return sourceDictionary[file];
             }
             else
             {
