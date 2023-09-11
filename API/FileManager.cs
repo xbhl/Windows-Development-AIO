@@ -7,11 +7,6 @@ namespace Windows_Development_AIO.API
 {
     public class FileManager
     {
-        private bool checkFile(string filePath)
-        {
-            return File.Exists(filePath);
-        }
-
         public string Download(string url, string filePath)
         {
             if (checkFile(filePath))
