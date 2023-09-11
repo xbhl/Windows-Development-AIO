@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+using System;
+using System.Threading.Tasks;
 using System.Net.Http;
 using System.IO;
 
@@ -7,29 +7,54 @@ namespace Windows_Development_AIO.API
 {
     public class FileManager
     {
-        public string Download(string url, string filePath)
+
+        private string CreateDirectory(string name)
         {
-            if (checkFile(filePath))
+            string directory = Path.Combine(Directory.GetCurrentDirectory(), $"{name}");
+
+            if (!Directory.Exists(directory))
             {
-                return filePath;
+                Directory.CreateDirectory(directory);
             }
-            else
+
+            return directory;
+        }
+
+        public async Task<string> Download(string url, string fileName)
+        {
+            string downloadDirectory = CreateDirectory("DownloadTemp");
+
+            string fullFilePath = Path.Combine(downloadDirectory, fileName);
+
+            if (File.Exists(fullFilePath))
             {
+                return fullFilePath;
+            }
+            else {
                 using (HttpClient client = new HttpClient())
                 {
-                    var response = client.GetAsync(url).Result;
-                    if (response.IsSuccessStatusCode)
+                    try
                     {
-                        var fileBytes = response.Content.ReadAsByteArrayAsync().Result;
-                        File.WriteAllBytes(filePath, fileBytes);
-                        return filePath;
+                        var response = await client.GetAsync(url);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                            await File.WriteAllBytesAsync(fullFilePath, fileBytes);
+                            return fullFilePath;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Failed to download the file. Status code: {response.StatusCode}");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        throw new InvalidOperationException("Failed to download the file.");
+                        throw new InvalidOperationException("An error occurred while downloading the file.", ex);
                     }
                 }
             }
         }
     }
+
 }
